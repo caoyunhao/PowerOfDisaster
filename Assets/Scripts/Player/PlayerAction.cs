@@ -106,11 +106,29 @@ public class PlayerAction : MonoBehaviour {
         }
     }
 
+    void LoadBullet(Collider other)
+    {
+        if (other.gameObject == m_AimObject && m_HasShoot)
+        {
+            m_HasShoot = false;
+            m_Bullet = m_AimObject;
+            m_HasBullet = true;
+            m_Bullet.GetComponent<BoxCollider>().isTrigger = true;
+            m_Bullet.GetComponent<Rigidbody>().useGravity = false;
+            m_Bullet.SetActive(false);
+        }
+    }
+
     void Shoot() {
         m_HasBullet = false;
         m_Bullet.transform.position = m_PlayerEyes.transform.position;
+        //m_Bullet.transform.rotation = m_PlayerEyes.transform.rotation;
+        m_Bullet.transform.rotation= Quaternion.Euler(0, 0, 0);
+        Rigidbody bulletBody = m_Bullet.GetComponent<Rigidbody>();
         m_Bullet.SetActive(true);
-        m_Bullet.GetComponent<Rigidbody>().AddForce(m_PlayerEyes.transform.forward * m_PushForceSize, ForceMode.Impulse);
+        bulletBody.velocity = m_PlayerEyes.transform.forward * m_PushForceSize / bulletBody.mass;
+        //m_Bullet.GetComponent<Rigidbody>().AddForce(m_PlayerEyes.transform.forward * m_PushForceSize, ForceMode.Impulse);
+        //Debug.Log("ForceMode.Impulse作用方式下C每帧增加的速度：" + m_Bullet.GetComponent<Rigidbody>().velocity.magnitude);
     }
 
     void FirstSkill() {
@@ -125,27 +143,12 @@ public class PlayerAction : MonoBehaviour {
 
     }
 
-
     void OnTriggerEnter(Collider other) {
-        if(other.gameObject == m_AimObject && m_HasShoot) {
-            m_HasShoot = false;
-            m_Bullet = m_AimObject;
-            m_HasBullet = true;
-            m_Bullet.GetComponent<BoxCollider>().isTrigger = true;
-            m_Bullet.GetComponent<Rigidbody>().useGravity = false;
-            m_Bullet.SetActive(false);
-        }
+        LoadBullet(other);
     }
 
     void OnTriggerStay(Collider other) {
-        if (other.gameObject == m_AimObject && m_HasShoot) {
-            m_HasShoot = false;
-            m_Bullet = m_AimObject;
-            m_HasBullet = true;
-            m_Bullet.GetComponent<BoxCollider>().isTrigger = true;
-            m_Bullet.GetComponent<Rigidbody>().useGravity = false;
-            m_Bullet.SetActive(false);
-        }
+        LoadBullet(other);
     }
 
     void OnTriggerExit(Collider other) {
